@@ -11,7 +11,7 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  azureServiceConnection: 'dotnet-pipeline'
+  azureServiceConnection: '' # Provide your Azure service connection name
   buildConfiguration: 'Release'
 
 stages:
@@ -66,6 +66,6 @@ stages:
           - task: AzureWebApp@1
             displayName: 'Deploy to Azure App Service'
             inputs:
-              azureSubscription: '$(azureServiceConnection)'
+              publishProfilePath: '$(System.DefaultWorkingDirectory)/publishprofile.pubxml' # using publish profile instead of service connection
               appName: 'dotnet-pipeline'
               package: '$(Build.ArtifactStagingDirectory)'
