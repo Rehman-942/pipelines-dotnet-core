@@ -1,0 +1,69 @@
+# Azure DevOps Pipeline for ASP.NET Core
+# Project: dotnet-pipeline
+# Two stages: Build & Deploy
+
+trigger:
+- master
+
+name: dotnet-pipeline
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  buildConfiguration: 'Release'
+
+stages:
+
+# ===================== BUILD STAGE =====================
+- stage: Build
+  displayName: Build Stage
+  jobs:
+  - job: Build
+    displayName: Build Job
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Install .NET SDK'
+      inputs:
+        packageType: 'sdk'
+        version: '8.x'
+
+    - script: |
+        dotnet restore
+        dotnet build --configuration $(buildConfiguration)
+      displayName: 'Restore & Build'
+
+    - script: dotnet test --no-build --verbosity normal
+      displayName: 'Run Tests'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(System.DefaultWorkingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+
+# ===================== DEPLOY STAGE =====================
+- stage: Deploy
+  displayName: Deploy Stage
+  dependsOn: Build
+  jobs:
+  - deployment: DeployWebApp
+    displayName: 'Deploy to Azure Web App'
+    environment: 'production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadBuildArtifacts@0
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'drop'
+              downloadPath: '$(System.DefaultWorkingDirectory)'
+
+          - task: AzureWebApp@1
+            displayName: 'Deploy to Azure App Service'
+            inputs:
+              azureSubscription: '<YOUR-SERVICE-CONNECTION>'
+              appName: 'dotnet-pipeline'
+              package: '$(System.DefaultWorkingDirectory)/**/publish.zip'
