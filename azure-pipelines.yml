@@ -11,7 +11,7 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  azureServiceConnection: '' # Provide your Azure service connection name
+  azureServiceConnection: 'dotnet-pipeline'
   buildConfiguration: 'Release'
 
 stages:
