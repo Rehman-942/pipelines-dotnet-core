@@ -11,8 +11,8 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  buildConfiguration: 'Release'
   azureServiceConnection: '' # Provide your Azure service connection name
+  buildConfiguration: 'Release'
   buildConfiguration: 'Release'
 
 stages:
