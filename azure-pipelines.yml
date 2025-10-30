@@ -12,6 +12,8 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
+  azureServiceConnection: '' # Provide your Azure service connection name
+  buildConfiguration: 'Release'
 
 stages:
 
@@ -64,6 +66,6 @@ stages:
           - task: AzureWebApp@1
             displayName: 'Deploy to Azure App Service'
             inputs:
-              azureSubscription: '<YOUR-SERVICE-CONNECTION>'
+              azureSubscription: '$(azureServiceConnection)'
               appName: 'dotnet-pipeline'
               package: '$(System.DefaultWorkingDirectory)/**/publish.zip'
